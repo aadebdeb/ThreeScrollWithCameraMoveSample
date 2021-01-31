@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Three.js Camera Move with Scroll Sample</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      p {
+        color: white;
+        font: 5rem bold;
+        margin: 0;
+      }
+      canvas {
+        margin: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="height: 5000px">
+        <p style="position: absolute; top: 0px;">0: Red Sphere</p>
+        <p style="position: absolute; top: 1000px;">1000: Green Sphere</p>
+        <p style="position: absolute; top: 2000px;">2000: Blue Sphere</p>
+        <p style="position: absolute; top: 3000px;">3000: White Sphere</p>
+        <p style="position: absolute; top: 4000px;">4000: Black Sphere</p>
+    </div>
+    <canvas id="canvas"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r124/three.min.js" integrity="sha512-jeYvJdyAYkpQCY/omvCYQo89qA5YxDW4JBT7COPsHT2sOAanwxkZRFeP9gc69b5reSDpZIoyCqZQZcWZkbB5Gw==" crossorigin="anonymous"></script>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor(new THREE.Color(0x999999), 1.0);
+
+      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
+      const scene = new THREE.Scene();
+
+      const sphereGeom = new THREE.SphereBufferGeometry();
+      const redSphere = new THREE.Mesh(sphereGeom, new THREE.MeshBasicMaterial({ color: new THREE.Color(0xff0000) }));
+      const greenSphere = new THREE.Mesh(sphereGeom, new THREE.MeshBasicMaterial({ color: new THREE.Color(0x00ff00) }));
+      const blueSphere = new THREE.Mesh(sphereGeom, new THREE.MeshBasicMaterial({ color: new THREE.Color(0x0000ff) }));
+      const whiteSphere = new THREE.Mesh(sphereGeom, new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffffff) }));
+      const blackSphere = new THREE.Mesh(sphereGeom, new THREE.MeshBasicMaterial({ color: new THREE.Color(0x000000) }));
+      scene.add(redSphere);
+      scene.add(greenSphere);
+      scene.add(blueSphere);
+      scene.add(whiteSphere);
+      scene.add(blackSphere);  
+
+      const interval = 10.0;
+      redSphere.position.y = -0.5 * interval;
+      greenSphere.position.y = -1.5 * interval;
+      blueSphere.position.y = -2.5 * interval;
+      whiteSphere.position.y = -3.5 * interval;
+      blackSphere.position.y = -4.5 * interval;
+      const viewVerticalRange = 5.0 * interval;
+
+      const animate = () => {
+        requestAnimationFrame(animate);
+
+        const cameraVerticalRange =  viewVerticalRange * window.innerHeight / document.body.clientHeight;
+        camera.position.z = cameraVerticalRange / Math.tan(0.5 * camera.fov * Math.PI / 180.0) * 0.5;
+        const scrollRate = window.pageYOffset / (document.body.clientHeight - window.innerHeight);
+        camera.position.y = -0.5 * cameraVerticalRange - scrollRate * (viewVerticalRange - cameraVerticalRange);
+
+        renderer.render(scene, camera);
+      };
+      animate();
+
+      const resize = () => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(width, height);
+
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', resize);
+
+    </script>
+  </body>
+</html>
